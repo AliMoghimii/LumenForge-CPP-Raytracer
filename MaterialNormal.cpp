@@ -9,7 +9,7 @@ MaterialNormal::MaterialNormal(Color colorA, double ambient, double diffuse, dou
     this->reflection = reflection;
 }
 
-Color MaterialNormal::colorBlendingProperties(const Vector3D& hitPosition) const
+Color MaterialNormal::colorBlendingProperties(const Vector3D& hitPosition, const Vector3D& hitNormal) const
 {
     return this->colorA;
 }

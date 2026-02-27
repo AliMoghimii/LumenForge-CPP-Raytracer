@@ -50,9 +50,9 @@ int main()
 
     Engine engine = Engine();
 
-    Image image = engine.render(scene);
+    Image image = engine.render(scene, true, false, true);
 
-    image.exportImage("04 - Raytraced Scene.ppm");
+    image.exportImage("XX - Result.ppm");
 
     auto timerEnd = chrono::high_resolution_clock::now();
     chrono::duration<double> elapsed = timerEnd - timerStart;

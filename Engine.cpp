@@ -1,8 +1,10 @@
 #include "Engine.hpp"
+#include <cstdlib>
 
-Image Engine::render(const Scene& scene, bool shaded)
+Image Engine::render(const Scene& scene, bool shaded, bool antiAliasing, bool additiveReflection)
 {
     this->shaded = shaded;
+    this->additiveReflection = additiveReflection;
 
     int width = scene.width;
     int height = scene.height;
@@ -18,15 +20,35 @@ Image Engine::render(const Scene& scene, bool shaded)
     Vector3D camera = scene.camera;
     Image canvas = Image(width, height);
 
+    int currentSamples = antiAliasing ? this->samplesPerPixel : 1;
+
     for (int j = 0; j < height; ++j) 
     {
-        float y = y0 + j * ydelta;
+        float yBase = y0 + j * ydelta;
 
         for (int i = 0; i < width; ++i) 
         {
-            float x = x0 + i * xdelta;
-            Ray ray = Ray(camera, Vector3D(x, y) - camera);
-            canvas.setPixel(i, j, raytrace(ray, scene));
+            float xBase = x0 + i * xdelta;
+            Color accumulatedColor = Color(0, 0, 0);
+
+            for (int s = 0; s < currentSamples; ++s) 
+            {
+                double jitterX = 0.0;
+                double jitterY = 0.0;
+                
+                if (antiAliasing) 
+                {
+                    jitterX = (((double)rand() / RAND_MAX) - 0.5) * xdelta;
+                    jitterY = (((double)rand() / RAND_MAX) - 0.5) * ydelta;
+                }
+                
+                Ray ray = Ray(camera, Vector3D(xBase + jitterX, yBase + jitterY) - camera);
+                accumulatedColor = accumulatedColor + raytrace(ray, scene);
+            }
+
+            Color finalColor = accumulatedColor / currentSamples;
+            
+            canvas.setPixel(i, j, finalColor);
         }
 
         double progress = (double)(j) / height * 100;
@@ -61,12 +83,17 @@ Color Engine::raytrace(const Ray& ray, const Scene& scene, int depth)
         Ray reflectedRay = Ray(newRayOrigin, newRayDirection, false);
         
         Color reflectedColor = raytrace(reflectedRay, scene, depth + 1);
-        
-        // Blend base color
-        //color = localColor * (1.0 - objectHit->material->reflection) + reflectedColor * objectHit->material->reflection;
 
-        // Additive blending
-        color = localColor + (reflectedColor * objectHit->material->reflection);
+        if (this->additiveReflection) 
+        {
+            // Additive blending
+            color = localColor + (reflectedColor * objectHit->material->reflection);
+        } 
+        else 
+        {
+            // Interpolated blending
+            color = localColor * (1.0 - objectHit->material->reflection) + (reflectedColor * objectHit->material->reflection);
+        }
     }
     else
     {
@@ -100,13 +127,13 @@ Color Engine::colorBlending(Object3D* objectHit, const Vector3D& hitPosition, co
         return objectHit->material->colorA;
 
     Material* objectHitMaterial = objectHit->material;
-    Color objectHitColor = objectHitMaterial->colorBlendingProperties(hitPosition); 
+    Color objectHitColor = objectHitMaterial->colorBlendingProperties(hitPosition, hitNormal); 
     
     Ray rayToCamera = Ray(hitPosition, scene.camera - hitPosition, true); 
     
     Color newColor = objectHitColor * objectHitMaterial->ambient;
 
-    double shadowDetectDistanceHit;
+    double shadowDetectDistanceHit; 
     Object3D* shadowDetectObjectHit;
     
     Vector3D shadowRayOrigin = hitPosition + hitNormal * this->minDisplacement;
@@ -116,7 +143,7 @@ Color Engine::colorBlending(Object3D* objectHit, const Vector3D& hitPosition, co
         Ray rayToLight = Ray(shadowRayOrigin, light->position - hitPosition);
         
         tie(shadowDetectObjectHit, shadowDetectDistanceHit) = rayCollision(rayToLight, scene);
-
+        
         if(shadowDetectObjectHit == nullptr || shadowDetectDistanceHit > (light->position - hitPosition).magnitude()) 
         {
             newColor = newColor + lambertianShading(objectHitMaterial, objectHitColor, hitNormal, rayToLight);

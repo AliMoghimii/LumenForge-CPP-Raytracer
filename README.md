@@ -45,7 +45,7 @@ A basic Raytracer with no external dependencies, implemented in C/C++ as part of
 
 **To clear the compiled files**
 
-* make clear
+* make clean
 
 **To make the files and run the program**
 

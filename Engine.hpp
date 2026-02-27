@@ -21,10 +21,12 @@ class Engine
     public: 
 
     bool shaded = true;
+    bool additiveReflection = true;
     int maxDepth = 5;
     double minDisplacement = 0.0001;
+    int samplesPerPixel = 16; 
 
-    Image render(const Scene& scene, bool shaded = true);
+    Image render(const Scene& scene, bool shaded = true, bool antiAliasing = true, bool additiveReflection = true);
 
     Color raytrace(const Ray& ray, const Scene& scene, int depth = 0);
 

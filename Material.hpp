@@ -19,7 +19,7 @@ class Material
 
     Material();
 
-    virtual Color colorBlendingProperties(const Vector3D& hitPosition) const;
+    virtual Color colorBlendingProperties(const Vector3D& hitPosition, const Vector3D& hitNormal) const;
 };
 
 #endif
