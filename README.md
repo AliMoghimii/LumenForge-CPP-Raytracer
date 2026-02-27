@@ -11,6 +11,7 @@ A basic Raytracer with no external dependencies, implemented in C/C++ as part of
     <img src="https://github.com/AliMoghimii/LumenForge-CPP-Raytracer/blob/main/Results/01%20-%20Render%20Test.png" width="360" height="360">
     <img src="https://github.com/AliMoghimii/LumenForge-CPP-Raytracer/blob/main/Results/02%20-%20Shading%20Test.png" width="360" height="360">
     <img src="https://github.com/AliMoghimii/LumenForge-CPP-Raytracer/blob/main/Results/03%20-%20Reflection%20Test.png" width="720" height="405">
+    <img src="https://github.com/AliMoghimii/LumenForge-CPP-Raytracer/blob/main/Results/04%20-%20Raytraced%20Scene.png" width="720" height="405">
 </div>
 
 # Manual compile examples

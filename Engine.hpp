@@ -12,6 +12,8 @@
 #include <math.h>
 #include <float.h>
 #include <iostream>
+#include <utility>
+
 using namespace std;
 
 class Engine 
@@ -20,13 +22,13 @@ class Engine
 
     bool shaded = true;
     int maxDepth = 5;
-    int minDisplacement = 0.0001;
+    double minDisplacement = 0.0001;
 
     Image render(const Scene& scene, bool shaded = true);
 
     Color raytrace(const Ray& ray, const Scene& scene, int depth = 0);
 
-    pair<Object3D*, float> rayCollision(const Ray& ray, const Scene& scene);
+    pair<Object3D*, double> rayCollision(const Ray& ray, const Scene& scene); 
 
     Color colorBlending(Object3D* objectHit, const Vector3D& hitPosition, const Vector3D& hitNormal, const Scene& scene);
 

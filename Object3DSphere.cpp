@@ -23,11 +23,13 @@ double Object3DSphere::object3DIntersects(const Ray& ray) const
 
     if(discriminant >= 0) 
     {
-        double dist = (-b + sqrt(discriminant)) / (2.0 * a);
+        double dist = (-b - sqrt(discriminant)) / (2.0 * a);
         if(dist > 0) 
-        {
             return dist;
-        }
+        
+        dist = (-b + sqrt(discriminant)) / (2.0 * a);
+        if(dist > 0) 
+            return dist;
     }
     return -1.0;
 }
