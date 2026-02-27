@@ -21,7 +21,7 @@ class Engine
     public: 
 
     bool shaded = true;
-    bool additiveReflection = true;
+    bool additiveReflection = true; 
     int maxDepth = 5;
     double minDisplacement = 0.0001;
     int samplesPerPixel = 16; 

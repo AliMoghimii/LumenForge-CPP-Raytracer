@@ -5,7 +5,7 @@
 #include "Scene.hpp"
 #include "Engine.hpp"
 #include "Light.hpp"
-#include "MaterialNormal.hpp"
+#include "MaterialSimple.hpp"
 #include "MaterialCheckered.hpp"
 
 #include <vector>
@@ -27,18 +27,18 @@ int main()
     
     vector<Object3D*> objects;
     
-    objects.push_back(new Object3DSphere(Vector3D(0, 10000.5, 1), 10000.0, new MaterialNormal(color.HexToRgb("#111111"), 0.2, 1.0, 1.0, 0.2)));
+    objects.push_back(new Object3DSphere(Vector3D(0, 10000.5, 1), 10000.0, new MaterialSimple(color.HexToRgb("#111111"), 0.2, 1.0, 1.0, 0.2)));
 
-    objects.push_back(new Object3DSphere(Vector3D(-0.25, 0, 0.6), 0.5, new MaterialNormal(color.HexToRgb("#FF0000"))));
+    objects.push_back(new Object3DSphere(Vector3D(-0.25, 0, 0.6), 0.5, new MaterialSimple(color.HexToRgb("#FF0000"))));
 
-    objects.push_back(new Object3DSphere(Vector3D(-0.15, -0.1, 0.15), 0.1, new MaterialNormal(color.HexToRgb("#FFFFFF"), 0.05, 1.0, 1.0, 0.01)));
-    objects.push_back(new Object3DSphere(Vector3D(-0.12, -0.12, 0.05), 0.05, new MaterialNormal(color.HexToRgb("#000000"), 0.05, 1.0, 1.0, 0.01)));
-    objects.push_back(new Object3DSphere(Vector3D(-0.4, -0.1, 0.15), 0.1, new MaterialNormal(color.HexToRgb("#FFFFFF"), 0.05, 1.0, 1.0, 0.01)));
-    objects.push_back(new Object3DSphere(Vector3D(-0.37, -0.12, 0.05), 0.05, new MaterialNormal(color.HexToRgb("#000000"), 0.05, 1.0, 1.0, 0.01)));
+    objects.push_back(new Object3DSphere(Vector3D(-0.15, -0.1, 0.15), 0.1, new MaterialSimple(color.HexToRgb("#FFFFFF"), 0.05, 1.0, 1.0, 0.01)));
+    objects.push_back(new Object3DSphere(Vector3D(-0.12, -0.12, 0.05), 0.05, new MaterialSimple(color.HexToRgb("#000000"), 0.05, 1.0, 1.0, 0.01)));
+    objects.push_back(new Object3DSphere(Vector3D(-0.4, -0.1, 0.15), 0.1, new MaterialSimple(color.HexToRgb("#FFFFFF"), 0.05, 1.0, 1.0, 0.01)));
+    objects.push_back(new Object3DSphere(Vector3D(-0.37, -0.12, 0.05), 0.05, new MaterialSimple(color.HexToRgb("#000000"), 0.05, 1.0, 1.0, 0.01)));
     
-    objects.push_back(new Object3DSphere(Vector3D(1.3, -0.15, 1), 0.75, new MaterialNormal(color.HexToRgb("#FFFF00"))));
+    objects.push_back(new Object3DSphere(Vector3D(1.3, -0.15, 1), 0.75, new MaterialSimple(color.HexToRgb("#FFFF00"))));
     
-    objects.push_back(new Object3DSphere(Vector3D(1, -1.85, 8), 0.75, new MaterialNormal(color.HexToRgb("#00FF00"))));
+    objects.push_back(new Object3DSphere(Vector3D(1, -1.85, 8), 0.75, new MaterialSimple(color.HexToRgb("#00FF00"))));
 
     objects.push_back(new Object3DSphere(Vector3D(-5, 3, 5), 5, new MaterialCheckered(color.HexToRgb("#0000FF"), color.HexToRgb("#FFFFFF"))));
 
