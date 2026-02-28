@@ -1,4 +1,5 @@
 #include "Engine.hpp"
+#include "MaterialGlass.hpp" // Necessary for the dynamic_cast
 #include <vector>
 #include <thread>
 #include <atomic>
@@ -29,6 +30,7 @@ Image Engine::render(const Scene& scene, const Vector3D& lookAt, bool shaded, bo
     Vector3D cameraPos = scene.camera;
     Image canvas = Image(width, height);
 
+    // Look-At Basis Vectors
     Vector3D forward = (lookAt - cameraPos).normalize();
     Vector3D worldUp(0, 1, 0);
     Vector3D right = worldUp.cross(forward).normalize();
@@ -71,9 +73,7 @@ Image Engine::render(const Scene& scene, const Vector3D& lookAt, bool shaded, bo
                     }
                     
                     Vector3D localRayDir(xBase + jitterX, yBase + jitterY, 1.0);
-
                     Vector3D worldRayDir = (right * localRayDir.x) + (up * localRayDir.y) + (forward * localRayDir.z);
-
                     Ray ray = Ray(cameraPos, worldRayDir.normalize());
                     
                     accumulatedColor = accumulatedColor + raytrace(ray, scene);
@@ -125,26 +125,71 @@ Color Engine::raytrace(const Ray& ray, const Scene& scene, int depth)
 
     Color localColor = colorBlending(objectHit, hitPosition, hitNormal, scene);
 
-    if(this->reflections && depth < this->maxDepth && objectHit->material->reflection > 0.0)
+    Color reflectedColor(0, 0, 0);
+    Color refractedColor(0, 0, 0);
+
+    double reflection = objectHit->material->reflection;
+    double transparency = objectHit->material->transparency;
+    double ior = objectHit->material->ior;
+
+    // --- DYNAMIC FRESNEL (SCHLICK) CHECK ---
+    MaterialGlass* glass = dynamic_cast<MaterialGlass*>(objectHit->material);
+    if (glass) {
+        reflection = glass->calculateFresnel(ray.direction, hitNormal);
+        transparency = 1.0 - reflection;
+    }
+
+    // --- REFLECTION ---
+    if(this->reflections && depth < this->maxDepth && reflection > 0.0)
     {
         Vector3D newRayOrigin = hitPosition + hitNormal * this->minDisplacement;
         Vector3D newRayDirection = ray.direction - 2 * ray.direction.dot(hitNormal) * hitNormal;
         Ray reflectedRay = Ray(newRayOrigin, newRayDirection, false);
         
-        Color reflectedColor = raytrace(reflectedRay, scene, depth + 1);
-        
-        if (this->additiveReflection) 
-        {
-            color = localColor + (reflectedColor * objectHit->material->reflection);
-        } 
-        else 
-        {
-            color = localColor * (1.0 - objectHit->material->reflection) + (reflectedColor * objectHit->material->reflection);
+        reflectedColor = raytrace(reflectedRay, scene, depth + 1);
+    }
+
+    // --- REFRACTION (Snell's Law) ---
+    if(this->reflections && depth < this->maxDepth && transparency > 0.0)
+    {
+        double cosi = ray.direction.dot(hitNormal);
+        double etai = 1.0;
+        double etat = ior;
+        Vector3D n = hitNormal;
+
+        if (cosi > 0) {
+            swap(etai, etat);
+            n = hitNormal * -1;
+        } else {
+            cosi = -cosi;
+        }
+
+        double eta = etai / etat;
+        double k = 1.0 - eta * eta * (1.0 - cosi * cosi);
+
+        if (k >= 0) {
+            Vector3D refractDir = (ray.direction * eta) + (n * (eta * cosi - sqrt(k)));
+            refractDir = refractDir.normalize();
+
+            // Offset origin along the refracted path to avoid self-intersection
+            Vector3D refractOrigin = hitPosition + refractDir * this->minDisplacement;
+            Ray refractRay = Ray(refractOrigin, refractDir, false);
+            refractedColor = raytrace(refractRay, scene, depth + 1);
         }
     }
-    else
+
+    // --- FINAL BLENDING ---
+    if (this->additiveReflection) 
     {
-        color = localColor;
+        double opacity = 1.0 - transparency;
+        if (opacity < 0.0) opacity = 0.0;
+        color = (localColor * opacity) + (reflectedColor * reflection) + (refractedColor * transparency);
+    } 
+    else 
+    {
+        double opacity = 1.0 - reflection - transparency;
+        if (opacity < 0.0) opacity = 0.0;
+        color = (localColor * opacity) + (reflectedColor * reflection) + (refractedColor * transparency);
     }
 
     return color;
@@ -170,45 +215,47 @@ pair<Object3D*, double> Engine::rayCollision(const Ray& ray, const Scene& scene)
 
 Color Engine::colorBlending(Object3D* objectHit, const Vector3D& hitPosition, const Vector3D& hitNormal, const Scene& scene) 
 {
-    if(!this->shaded)
-        return objectHit->material->colorA;
+    if(!this->shaded) return objectHit->material->colorA;
 
     Material* objectHitMaterial = objectHit->material;
     Color objectHitColor = objectHitMaterial->colorBlendingProperties(hitPosition, hitNormal); 
-    
     Ray rayToCamera = Ray(hitPosition, scene.camera - hitPosition, true); 
-    
     Color newColor = objectHitColor * objectHitMaterial->ambient;
 
-    double shadowDetectDistanceHit; 
-    Object3D* shadowDetectObjectHit;
-    
     Vector3D shadowRayOrigin = hitPosition + hitNormal * this->minDisplacement;
     
     for (Light* light : scene.lights)
     {
         Ray rayToLight = Ray(shadowRayOrigin, light->position - hitPosition);
+        double lightDist = (light->position - hitPosition).magnitude();
         
-        bool inShadow = false;
+        // --- NEW: TRANSPARENT SHADOW LOGIC ---
+        double shadowIntensity = 1.0; 
 
         if (this->shadows) 
         {
-            tie(shadowDetectObjectHit, shadowDetectDistanceHit) = rayCollision(rayToLight, scene);
-            
-
-            if(shadowDetectObjectHit != nullptr && shadowDetectDistanceHit < (light->position - hitPosition).magnitude()) 
-            {
-                inShadow = true;
+            // We check all objects to see if they block this specific light
+            for (Object3D* obj : scene.objects) {
+                double dist = obj->object3DIntersects(rayToLight);
+                if (dist > 0 && dist < lightDist) {
+                    // If we hit a transparent object, we reduce light instead of blocking it
+                    if (obj->material->transparency > 0) {
+                        shadowIntensity *= obj->material->transparency; 
+                    } else {
+                        shadowIntensity = 0; // Solid object, total shadow
+                        break;
+                    }
+                }
             }
         }
 
-        if(!inShadow) 
+        if(shadowIntensity > 0) 
         {
-            newColor = newColor + lambertianShading(objectHitMaterial, objectHitColor, hitNormal, rayToLight);
-            newColor = newColor + blingPhongShading(objectHitMaterial, *light, hitNormal, rayToLight, rayToCamera, 50.0);
+            Color diffuse = lambertianShading(objectHitMaterial, objectHitColor, hitNormal, rayToLight);
+            Color specular = blingPhongShading(objectHitMaterial, *light, hitNormal, rayToLight, rayToCamera, 50.0);
+            newColor = newColor + (diffuse + specular) * shadowIntensity;
         }
     }
-
     return newColor;
 }
 

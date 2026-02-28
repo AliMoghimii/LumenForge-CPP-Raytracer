@@ -10,6 +10,7 @@
 #include "Engine.hpp"
 #include "Light.hpp"
 #include "MaterialSimple.hpp"
+#include "MaterialGlass.hpp"
 #include "MaterialCheckered.hpp"
 #include "ModelLoader.hpp"
 
@@ -48,6 +49,8 @@ int main()
 
     objects.push_back(new Object3DCube(Vector3D(0.25, -0.5, 0.25), Vector3D(0.5, -0.25, 0.5), new MaterialSimple(color.HexToRgb("#00FFFF")), Vector3D(0, 35, 0)));
     
+    //objects.push_back(new Object3DSphere(Vector3D(0.0, 0, -0.1), 0.4, new MaterialGlass(1.5)));
+
     Vector3D top(0, 1, 0);
     Vector3D front(-1, -1, 1);
     Vector3D backRight(1, -1, 1);
@@ -76,8 +79,8 @@ int main()
 
     MaterialSimple* modelMat = new MaterialSimple(color.HexToRgb("#8A2BE2"), 0.1, 1.0, 1.0, 0.2); 
 
-    //ModelLoader::load("model_cube.obj", objects, modelMat, Vector3D(-0.75, 0, 0), Vector3D(0, -35, 0), 0.1);
-    ModelLoader::load("model_shuttle.obj", objects, modelMat, Vector3D(-1.3, 0, 0.4), Vector3D(270, 45, 0), 0.07);
+    ModelLoader::load("model_cube.obj", objects, modelMat, Vector3D(-0.75, 0, 0), Vector3D(0, -35, 0), 0.1);
+    //ModelLoader::load("model_shuttle.obj", objects, modelMat, Vector3D(-1.3, 0, 0.4), Vector3D(270, 45, 0), 0.07);
     //ModelLoader::load("model_teapot.obj", objects, modelMat, Vector3D(-1.2, 0, 0.5), Vector3D(0, 0, 0), 0.004);
     //ModelLoader::load("model_doughnut.obj", objects, modelMat, Vector3D(-1.2, 0, 0.5), Vector3D(0, 0, 0), 0.004);
 
@@ -92,8 +95,9 @@ int main()
 
     //Image image = engine.render(scene, target, false, false, false, false, true); //only shapes
     //Image image = engine.render(scene, target, true, false, false, false, true); //only shading
-    //Image image = engine.render(scene, target, true, true, true, false, true); //raytracing + shadows
-    Image image = engine.render(scene, target, true, true, true, true, false); //full
+    //Image image = engine.render(scene, target, true, false, true, false, true); //raytracing without shadows
+    Image image = engine.render(scene, target, true, true, true, false, true); //raytracing with shadows
+    //Image image = engine.render(scene, target, true, true, true, true, true); //full
 
     image.exportImage("00 - Result.ppm");
 

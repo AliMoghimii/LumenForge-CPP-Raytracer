@@ -10,14 +10,17 @@ using namespace std;
 class Material
 {
     public: 
-
         Color colorA;
         double ambient;
         double diffuse;
         double specular;
         double reflection;
+        
+        double transparency;
+        double ior;
 
     Material();
+    virtual ~Material() {}
 
     virtual Color colorBlendingProperties(const Vector3D& hitPosition, const Vector3D& hitNormal) const;
 };

@@ -1,5 +1,5 @@
-output: Raytracer.o Image.o Color.o Vector3D.o Engine.o Ray.o ModelLoader.o Object3DSphere.o Object3DPlane.o Object3DTriangle.o Object3DQuad.o Object3DCube.o Object3D.o Scene.o Light.o MaterialSimple.o MaterialCheckered.o Material.o
-	g++ Raytracer.o Image.o Color.o Vector3D.o Engine.o Ray.o ModelLoader.o Object3DSphere.o Object3DPlane.o Object3DTriangle.o Object3DQuad.o Object3DCube.o Object3D.o Scene.o Light.o MaterialSimple.o MaterialCheckered.o Material.o -o output
+output: Raytracer.o Image.o Color.o Vector3D.o Engine.o Ray.o ModelLoader.o Object3DSphere.o Object3DPlane.o Object3DTriangle.o Object3DQuad.o Object3DCube.o Object3D.o Scene.o Light.o MaterialSimple.o MaterialGlass.o MaterialCheckered.o Material.o
+	g++ Raytracer.o Image.o Color.o Vector3D.o Engine.o Ray.o ModelLoader.o Object3DSphere.o Object3DPlane.o Object3DTriangle.o Object3DQuad.o Object3DCube.o Object3D.o Scene.o Light.o MaterialSimple.o MaterialGlass.o MaterialCheckered.o Material.o -o output
 
 Raytracer.o: Raytracer.cpp
 	g++ -c Raytracer.cpp
@@ -52,10 +52,11 @@ MaterialSimple.o: MaterialSimple.cpp
 MaterialCheckered.o: MaterialCheckered.cpp
 	g++ -c MaterialCheckered.cpp
 
+MaterialGlass.o: MaterialGlass.cpp
+	g++ -c MaterialGlass.cpp
+
 Material.o: Material.cpp
 	g++ -c Material.cpp
-
-
 
 run: output
 	./output
