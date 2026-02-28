@@ -21,13 +21,15 @@ class Engine
     public: 
 
     bool shaded = true;
+    bool shadows = true;
+    bool reflections = true;
     bool additiveReflection = true; 
     int maxDepth = 5;
     double minDisplacement = 0.0001;
     int samplesPerPixel = 16; 
 
-    Image render(const Scene& scene, bool shaded = true, bool antiAliasing = true, bool additiveReflection = true);
-
+    Image render(const Scene& scene, const Vector3D& lookAt, bool shaded, bool shadows, bool reflections, bool antiAliasing, bool additiveReflection, int numThreads = 0);
+    
     Color raytrace(const Ray& ray, const Scene& scene, int depth = 0);
 
     pair<Object3D*, double> rayCollision(const Ray& ray, const Scene& scene); 

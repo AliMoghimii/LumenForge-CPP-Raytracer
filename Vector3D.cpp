@@ -1,6 +1,6 @@
 #include "Vector3D.hpp"
 
-Vector3D::Vector3D(double x, double y, double z) //: x(x), y(y), z(z)
+Vector3D::Vector3D(double x, double y, double z)
 {
     this->x = x;
     this->y = y;
@@ -14,7 +14,6 @@ void Vector3D::printVector() const
 
 double Vector3D::magnitude() const
 {
-    //return sqrt(pow(x,2) + pow(y,2) + pow(z,2)); 
     return sqrt(this->dot(*this)); 
 }
 
@@ -26,6 +25,31 @@ Vector3D Vector3D::normalize() const
 double Vector3D::dot(Vector3D other) const
 {
     return this->x * other.x + this->y * other.y + this->z * other.z;
+}
+
+Vector3D Vector3D::cross(Vector3D other) const
+{
+    return Vector3D(this->y * other.z - this->z * other.y,
+                    this->z * other.x - this->x * other.z,
+                    this->x * other.y - this->y * other.x);
+}
+
+Vector3D Vector3D::rotateX(double angle) const 
+{
+    double rad = angle * 3.14159265359 / 180.0;
+    return Vector3D(x, y * cos(rad) - z * sin(rad), y * sin(rad) + z * cos(rad));
+}
+
+Vector3D Vector3D::rotateY(double angle) const 
+{
+    double rad = angle * 3.14159265359 / 180.0;
+    return Vector3D(x * cos(rad) + z * sin(rad), y, -x * sin(rad) + z * cos(rad));
+}
+
+Vector3D Vector3D::rotateZ(double angle) const 
+{
+    double rad = angle * 3.14159265359 / 180.0;
+    return Vector3D(x * cos(rad) - y * sin(rad), x * sin(rad) + y * cos(rad), z);
 }
 
 Vector3D Vector3D::operator+(Vector3D other) const
