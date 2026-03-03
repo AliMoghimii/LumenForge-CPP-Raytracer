@@ -32,12 +32,15 @@ A basic Raytracer with no external dependencies, implemented in C/C++ as part of
 # Compile using CMake file
 
 **Prerequisites**
-1. Make sure "g++" and "make" are present in your enviroment variables, test with, g++ --version and make --version
-    if missing add the following to "Path" in "User variables for YOURNAME" (VSCode MSYS2) </br>
-    * Base compiler files :   C:\msys64\ucrt64\bin </br>
-    * CMake :                 C:\msys64\usr\bin </br>
 
-2. Install the Makefile extension by Microsoft and add the "C:\msys64\usr\bin" path to the Make Path extension settings field.
+Reference: https://code.visualstudio.com/docs/cpp/config-mingw
+
+1. Make sure "g++" and "make" are present in your enviroment variables, test with, g++ --version and make --version </br>
+    if missing add the following to "Path" in "User variables for YOURNAME" (VSCode MSYS2) </br>
+    * Default base compiler files :   C:\msys64\ucrt64\bin </br>
+    * Default CMake :                 C:\msys64\usr\bin </br>
+
+3. Install the Makefile extension by Microsoft and add the "C:\msys64\usr\bin" path to the Make Path extension settings field.
 
 
 **To run the make file**
