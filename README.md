@@ -36,7 +36,7 @@ A basic Raytracer with no external dependencies, implemented in C/C++ as part of
 Reference: https://code.visualstudio.com/docs/cpp/config-mingw
 
 1. Make sure "g++" and "make" are present in your enviroment variables, test with, g++ --version and make --version </br>
-    if missing add the following to "Path" in "User variables for YOURNAME" (VSCode MSYS2) </br>
+    If missing add the following to "Path" in "User variables for YOURNAME" (VSCode MSYS2) </br>
     * Default base compiler files :   C:\msys64\ucrt64\bin </br>
     * Default CMake :                 C:\msys64\usr\bin </br>
 
